@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Optimizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Study Optimizer</h1>
+      <p class="subtitle">Transform web content into study-optimized formats</p>
+    </header>
+
+    <main>
+      <section class="input-section">
+        <div class="url-input-wrapper">
+          <input
+            type="url"
+            id="urlInput"
+            placeholder="Paste article URL here..."
+            autocomplete="off"
+          >
+          <button id="processBtn" class="primary-btn">
+            <span class="btn-text">Optimize</span>
+            <span class="btn-loading hidden">
+              <span class="spinner"></span>
+              Processing...
+            </span>
+          </button>
+        </div>
+        <div id="errorMessage" class="error-message hidden"></div>
+      </section>
+
+      <section id="resultsSection" class="results-section hidden">
+        <div class="article-info">
+          <h2 id="articleTitle"></h2>
+          <p id="articleMeta" class="meta"></p>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="flashcards">Flashcards</button>
+          <button class="tab" data-tab="questions">Questions</button>
+        </div>
+
+        <div class="tab-content">
+          <div id="notesTab" class="tab-panel active">
+            <div class="panel-header">
+              <h3>Condensed Notes</h3>
+              <button class="copy-btn" data-copy="notes">Copy</button>
+            </div>
+            <div id="notesContent" class="content-area"></div>
+          </div>
+
+          <div id="flashcardsTab" class="tab-panel hidden">
+            <div class="panel-header">
+              <h3>Flashcards</h3>
+              <div class="btn-group">
+                <button class="copy-btn" data-copy="flashcards">Copy</button>
+                <button id="exportAnkiBtn" class="export-btn">Export to Anki</button>
+              </div>
+            </div>
+            <div id="flashcardsContent" class="content-area flashcards-grid"></div>
+          </div>
+
+          <div id="questionsTab" class="tab-panel hidden">
+            <div class="panel-header">
+              <h3>Key Questions</h3>
+              <button class="copy-btn" data-copy="questions">Copy</button>
+            </div>
+            <div id="questionsContent" class="content-area"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Using evidence-based memory techniques: Active Recall, Spaced Repetition, Chunking</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

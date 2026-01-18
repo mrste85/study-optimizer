@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/api/extract", "destination": "/api/extract" },
+    { "source": "/api/process", "destination": "/api/process" },
+    { "source": "/api/anki", "destination": "/api/anki" }
+  ],
+  "functions": {
+    "api/process.js": {
+      "maxDuration": 60
+    }
+  }
+}
