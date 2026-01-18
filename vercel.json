@@ -5,6 +5,9 @@
     { "source": "/api/anki", "destination": "/api/anki" }
   ],
   "functions": {
+    "api/extract.js": {
+      "maxDuration": 60
+    },
     "api/process.js": {
       "maxDuration": 60
     }
