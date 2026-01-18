@@ -50,13 +50,46 @@ header h1 {
   margin-bottom: 2rem;
 }
 
+.input-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.input-tab:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.input-tab.active {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: #eff6ff;
+}
+
+.input-panel {
+  margin-bottom: 1rem;
+}
+
 .url-input-wrapper {
   display: flex;
   gap: 0.75rem;
 }
 
 #urlInput {
-  flex: 1;
+  width: 100%;
   padding: 0.875rem 1rem;
   font-size: 1rem;
   border: 2px solid var(--border);
@@ -69,7 +102,82 @@ header h1 {
   border-color: var(--primary);
 }
 
+.file-upload-wrapper {
+  width: 100%;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface);
+}
+
+.file-upload-label:hover {
+  border-color: var(--primary);
+  background: #f8faff;
+}
+
+.file-upload-label.drag-over {
+  border-color: var(--primary);
+  background: #eff6ff;
+}
+
+.file-upload-label.has-file {
+  border-color: var(--success);
+  background: #f0fdf4;
+}
+
+.file-upload-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+#fileUploadText {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+#textInput {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s;
+}
+
+#textInput:focus {
+  border-color: var(--primary);
+}
+
+.title-input {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.title-input:focus {
+  border-color: var(--primary);
+}
+
 .primary-btn {
+  width: 100%;
   padding: 0.875rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
@@ -79,7 +187,6 @@ header h1 {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s;
-  min-width: 140px;
 }
 
 .primary-btn:hover:not(:disabled) {

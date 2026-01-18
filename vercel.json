@@ -2,13 +2,17 @@
   "rewrites": [
     { "source": "/api/extract", "destination": "/api/extract" },
     { "source": "/api/process", "destination": "/api/process" },
-    { "source": "/api/anki", "destination": "/api/anki" }
+    { "source": "/api/anki", "destination": "/api/anki" },
+    { "source": "/api/upload", "destination": "/api/upload" }
   ],
   "functions": {
     "api/extract.js": {
       "maxDuration": 60
     },
     "api/process.js": {
+      "maxDuration": 60
+    },
+    "api/upload.js": {
       "maxDuration": 60
     }
   }

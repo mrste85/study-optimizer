@@ -15,21 +15,54 @@
 
     <main>
       <section class="input-section">
-        <div class="url-input-wrapper">
-          <input
-            type="url"
-            id="urlInput"
-            placeholder="Paste article URL here..."
-            autocomplete="off"
-          >
-          <button id="processBtn" class="primary-btn">
-            <span class="btn-text">Optimize</span>
-            <span class="btn-loading hidden">
-              <span class="spinner"></span>
-              Processing...
-            </span>
-          </button>
+        <div class="input-tabs">
+          <button class="input-tab active" data-input="url">URL</button>
+          <button class="input-tab" data-input="file">Upload PDF</button>
+          <button class="input-tab" data-input="text">Paste Text</button>
         </div>
+
+        <div id="urlInputPanel" class="input-panel active">
+          <div class="url-input-wrapper">
+            <input
+              type="url"
+              id="urlInput"
+              placeholder="Paste article URL here..."
+              autocomplete="off"
+            >
+          </div>
+        </div>
+
+        <div id="fileInputPanel" class="input-panel hidden">
+          <div class="file-upload-wrapper">
+            <label for="fileInput" class="file-upload-label">
+              <span class="file-upload-icon">📄</span>
+              <span id="fileUploadText">Choose PDF file or drag & drop</span>
+            </label>
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+          </div>
+        </div>
+
+        <div id="textInputPanel" class="input-panel hidden">
+          <textarea
+            id="textInput"
+            placeholder="Paste your study content here..."
+            rows="6"
+          ></textarea>
+          <input
+            type="text"
+            id="textTitleInput"
+            placeholder="Title (optional)"
+            class="title-input"
+          >
+        </div>
+
+        <button id="processBtn" class="primary-btn">
+          <span class="btn-text">Optimize</span>
+          <span class="btn-loading hidden">
+            <span class="spinner"></span>
+            Processing...
+          </span>
+        </button>
         <div id="errorMessage" class="error-message hidden"></div>
       </section>
 

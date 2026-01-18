@@ -1,5 +1,10 @@
 // DOM Elements
 const urlInput = document.getElementById('urlInput');
+const fileInput = document.getElementById('fileInput');
+const textInput = document.getElementById('textInput');
+const textTitleInput = document.getElementById('textTitleInput');
+const fileUploadLabel = document.querySelector('.file-upload-label');
+const fileUploadText = document.getElementById('fileUploadText');
 const processBtn = document.getElementById('processBtn');
 const btnText = processBtn.querySelector('.btn-text');
 const btnLoading = processBtn.querySelector('.btn-loading');
@@ -9,7 +14,13 @@ const articleTitle = document.getElementById('articleTitle');
 const articleMeta = document.getElementById('articleMeta');
 const tabs = document.querySelectorAll('.tab');
 const tabPanels = document.querySelectorAll('.tab-panel');
+const inputTabs = document.querySelectorAll('.input-tab');
+const inputPanels = document.querySelectorAll('.input-panel');
 const exportAnkiBtn = document.getElementById('exportAnkiBtn');
+
+// Current input mode
+let currentInputMode = 'url';
+let selectedFile = null;
 
 // Store processed data
 let currentData = {
@@ -26,50 +37,102 @@ function init() {
     if (e.key === 'Enter') handleProcess();
   });
 
+  // Input tab switching
+  inputTabs.forEach((tab) => {
+    tab.addEventListener('click', () => switchInputMode(tab.dataset.input));
+  });
+
+  // Output tab switching
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
 
+  // Copy buttons
   document.querySelectorAll('.copy-btn').forEach((btn) => {
     btn.addEventListener('click', () => handleCopy(btn.dataset.copy));
+  });
+
+  // File upload handling
+  fileInput.addEventListener('change', handleFileSelect);
+
+  // Drag and drop
+  fileUploadLabel.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileUploadLabel.classList.add('drag-over');
+  });
+  fileUploadLabel.addEventListener('dragleave', () => {
+    fileUploadLabel.classList.remove('drag-over');
+  });
+  fileUploadLabel.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileUploadLabel.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type === 'application/pdf') {
+      selectedFile = files[0];
+      updateFileUploadUI();
+    }
   });
 
   exportAnkiBtn.addEventListener('click', handleAnkiExport);
 }
 
+// Switch input mode (URL, File, Text)
+function switchInputMode(mode) {
+  currentInputMode = mode;
+
+  inputTabs.forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.input === mode);
+  });
+
+  document.getElementById('urlInputPanel').classList.toggle('hidden', mode !== 'url');
+  document.getElementById('urlInputPanel').classList.toggle('active', mode === 'url');
+  document.getElementById('fileInputPanel').classList.toggle('hidden', mode !== 'file');
+  document.getElementById('fileInputPanel').classList.toggle('active', mode === 'file');
+  document.getElementById('textInputPanel').classList.toggle('hidden', mode !== 'text');
+  document.getElementById('textInputPanel').classList.toggle('active', mode === 'text');
+
+  hideError();
+}
+
+// Handle file selection
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file && file.type === 'application/pdf') {
+    selectedFile = file;
+    updateFileUploadUI();
+  }
+}
+
+function updateFileUploadUI() {
+  if (selectedFile) {
+    fileUploadText.textContent = selectedFile.name;
+    fileUploadLabel.classList.add('has-file');
+  } else {
+    fileUploadText.textContent = 'Choose PDF file or drag & drop';
+    fileUploadLabel.classList.remove('has-file');
+  }
+}
+
 // Main processing function
 async function handleProcess() {
-  const url = urlInput.value.trim();
-
-  if (!url) {
-    showError('Please enter a URL');
-    return;
-  }
-
-  if (!isValidUrl(url)) {
-    showError('Please enter a valid URL');
-    return;
-  }
-
-  setLoading(true);
   hideError();
 
-  try {
-    // Step 1: Extract content
-    const extractResponse = await fetch('/api/extract', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
-    });
+  let extracted;
 
-    if (!extractResponse.ok) {
-      const error = await extractResponse.json();
-      throw new Error(error.error || 'Failed to extract content');
+  try {
+    if (currentInputMode === 'url') {
+      extracted = await processUrl();
+    } else if (currentInputMode === 'file') {
+      extracted = await processFile();
+    } else if (currentInputMode === 'text') {
+      extracted = processText();
     }
 
-    const extracted = await extractResponse.json();
+    if (!extracted) return;
 
-    // Step 2: Process with AI
+    setLoading(true);
+
+    // Process with AI
     const processResponse = await fetch('/api/process', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -101,6 +164,95 @@ async function handleProcess() {
   } finally {
     setLoading(false);
   }
+}
+
+// Process URL input
+async function processUrl() {
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    showError('Please enter a URL');
+    return null;
+  }
+
+  if (!isValidUrl(url)) {
+    showError('Please enter a valid URL');
+    return null;
+  }
+
+  setLoading(true);
+
+  const extractResponse = await fetch('/api/extract', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  });
+
+  if (!extractResponse.ok) {
+    const error = await extractResponse.json();
+    throw new Error(error.error || 'Failed to extract content');
+  }
+
+  return await extractResponse.json();
+}
+
+// Process file upload
+async function processFile() {
+  if (!selectedFile) {
+    showError('Please select a PDF file');
+    return null;
+  }
+
+  setLoading(true);
+
+  // Read file as base64
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(selectedFile);
+  });
+
+  const uploadResponse = await fetch('/api/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      file: base64,
+      filename: selectedFile.name,
+    }),
+  });
+
+  if (!uploadResponse.ok) {
+    const error = await uploadResponse.json();
+    throw new Error(error.error || 'Failed to process PDF');
+  }
+
+  return await uploadResponse.json();
+}
+
+// Process text input
+function processText() {
+  const text = textInput.value.trim();
+  const title = textTitleInput.value.trim() || 'Pasted Content';
+
+  if (!text) {
+    showError('Please enter some text');
+    return null;
+  }
+
+  if (text.length < 100) {
+    showError('Please enter more content (at least 100 characters)');
+    return null;
+  }
+
+  return {
+    title: title,
+    content: text,
+    siteName: 'Pasted Text',
+  };
 }
 
 // Display results
